@@ -1,12 +1,10 @@
 <?php
 
-include("functions.php");
+include("inc.php");
 
 if(isset($_POST['month'])&&!empty($_POST['month'])){
 	echo $_POST['month'];
 }
-
-addAccount('test',10);
 
 ?><!DOCTYPE html>
 <html>
