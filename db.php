@@ -5,10 +5,13 @@
 
 class db extends mysqli {
 	public function get_results($query) {
-		$res = $this->query($query);
-		while ( $res && $row = $res->fetch_assoc() ) {
-			$out[] = $row;
+		$res = $this->multi_query($query);
+		if ( ! $res ) {
+			print_r($this->error);
 		}
-		return isset($out) ? $out : false;
+		return gettype($res)!="boolean" ? $res->fetch_all() : false;
 	}
 }
+
+global $db;
+$db = new db($host='localhost', $username="root", $passwd="", $dbname="finances");
