@@ -4,6 +4,7 @@
  */
 
 class db extends mysqli {
+	
 	public function get_results($query) {
 		$res = $this->multi_query($query);
 		if ( ! $res ) {
@@ -14,4 +15,4 @@ class db extends mysqli {
 }
 
 global $db;
-$db = new db($host='localhost', $username="root", $passwd="", $dbname="finances");
+$db = new db('localhost', "root", "", "finances");

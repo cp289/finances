@@ -1,8 +1,13 @@
 <?php
 
 class finance_api {
-	function __construct () {
-		$this->createFinancesDatabase('finances');
+	
+	private $dbname;
+	
+	function __construct ( $dbname ) {
+		global $db;
+		$this->createFinancesDatabase($dbname);
+		$db->select_db($dbname);
 	}
 	
 	public function createFinancesDatabase($dbname){
@@ -10,7 +15,6 @@ class finance_api {
 		
 		// create finances and select it
 		$db->query("CREATE DATABASE IF NOT EXISTS `$dbname`;");
-		$db->select_db('finances');
 		
 		// create data tables
 		$sql = "CREATE TABLE IF NOT EXISTS transactions (
@@ -48,7 +52,6 @@ class finance_api {
 
 	public function addAccount($name, $type) {
 		global $db;
-		$db->select_db('finances');
 		$out=$db->query("INSERT INTO accounts (type,name) VALUES ('$type','$name');");
 		$sql = "SELECT * FROM accounts;";
 		$out=$db->get_results($sql);
@@ -57,4 +60,4 @@ class finance_api {
 
 // create global API object
 global $fin_api;
-$fin_api = new finance_api();
+$fin_api = new finance_api( 'finances' );
