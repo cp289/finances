@@ -43,12 +43,14 @@ class finance_api {
 			`date` date NOT NULL,
 			`recur` smallint NOT NULL,
 			`descr` varchar(150),
+			UNIQUE (name),
 			PRIMARY KEY (id)
 		);";
 		$sql .= "CREATE TABLE IF NOT EXISTS tags (
 			`id` mediumint NOT NULL AUTO_INCREMENT,
 			`name` varchar(50) NOT NULL,
 			`descr` varchar(150),
+			UNIQUE (name),
 			PRIMARY KEY (id)
 		);";
 		$sql .= "CREATE TABLE IF NOT EXISTS tag_map (
@@ -57,20 +59,20 @@ class finance_api {
 			`tag` mediumint NOT NULL,
 			PRIMARY KEY (id)
 		);";
-		//$sql .= "CREATE TABLE IF NOT EXISTS tag_map ("
 		$db->get_results($sql);
 	}
 	
 	private function _resetDatabase() {
 		global $db;
-		$db->get_results( "DROP DATABASE $dbname" );
+		$db->get_results( "DROP DATABASE ?", array($this->dbname) );
 		$this->_createDatabase();
 	}
 	
 	// Important: escape all parameters (find right method)
 	public function addAccount($name, $type, $descr='NULL') {
 		global $db;
-		$db->get_results("INSERT INTO accounts (type,name,descr) VALUES ('$type','$name','$descr');");
+		$params = array($type, $name, $descr);
+		$db->get_results("INSERT INTO accounts (type,name,descr) VALUES (?,?,?);", $params);
 	}
 	
 	public function addTrans($date, $location, $origin, $destin, $amount, $descr) {
@@ -80,6 +82,46 @@ class finance_api {
 		$sql = "INSERT INTO transactions (time_ent,date,location,origin,destin,amount,descr)
 			VALUES (?,?,?,?,?,?,?);";
 		$db->get_results($sql, $params);
+	}
+	
+	private function _createTag($name, $descr=null) {
+		global $db;
+		$descr_col = empty($descr) ? '' : ',descr';
+		$descr_val = empty($descr) ? '' : ",?";
+		$params = empty($descr) ? array($name) : array($name, $descr);
+		$db->get_results("INSERT INTO tags (name{$descr_col}) VALUES (?{$descr_val})", $params);
+		pre("INSERT INTO tags (name{$descr_col}) VALUES ('$name'{$descr_val})");
+	}
+	
+	private function _createTagMap($trans, $tag_name) {
+		global $db;
+		
+		// tag must exist!
+		$params = array($trans, $tag_name);
+		$sql = "INSERT INTO tag_map (trans, tag)
+			SELECT transactions.id AS trans, tags.id AS tag
+			FROM transactions INNER JOIN tags
+			ON transactions.id=?
+			AND tags.name=?
+			LIMIT 1";
+		pp($db->get_results($sql, $params));
+	}
+	
+	// more corner cases?
+	public function addTag($trans, $name, $descr=null) {
+		global $db;
+		// create new tag if necessary
+		if ( $db->get_results("SELECT COUNT(*) AS count FROM tags WHERE name=?;",array($name))[0]->count < 1 ) {
+			$this->_createTag($name,$descr);
+		}
+		if ( $db->get_results(
+				"SELECT COUNT(*) AS count FROM tag_map
+				INNER JOIN tags ON tag_map.tag=tags.id
+				WHERE name=?",
+				array($name)
+			)[0]->count < 1 ) {
+			$this->_createTagMap($trans, $name);
+		}
 	}
 }
 
