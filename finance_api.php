@@ -123,6 +123,45 @@ class finance_api {
 			$this->_createTagMap($trans, $name);
 		}
 	}
+	
+	public function getTag($name) {
+		global $db;
+		if ( sizeof( $out=$db->get_results("SELECT * FROM tags WHERE name=?;", array($name)) )<1 ) return false;
+		return $out[0];
+	}
+	
+	public function updateTag($name, $new_name=null, $new_descr=null) {
+		global $db;
+		if ( $db->get_results("SELECT COUNT(*) AS count FROM tags WHERE name=?;",array($name))[0]->count < 1 )
+			return false;
+		$params = array();
+		if (!empty($new_name)) {
+			$params[] = $new_name;
+			$sqls[] = 'name=?';
+		}
+		if (!empty($new_descr)) {
+			$params[] = $new_descr;
+			$sqls[] = 'descr=?';
+		}
+		if (sizeof($params) > 0) {
+			$params[] = $name;
+			$new_sql = implode(',', $sqls);
+			$db->get_results("UPDATE tags SET {$new_sql} WHERE name=?", $params);
+		}
+	}
+	
+	public function deleteTag($name) {
+		global $db;
+		// delete all tag maps
+		// try to use just SQL...
+		$id = $this->getTag($name)->id;
+		$db->get_results(
+			"DELETE FROM tag_map WHERE tag=?",
+			array($id)
+		);
+		// delete tag
+		$db->get_results("DELETE FROM tags WHERE name=?", array($name));
+	}
 }
 
 // create global API object
