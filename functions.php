@@ -15,6 +15,7 @@ function pre($var) {
 }
 
 function db_error($obj, $message) {
+	if (!PRINT_DB_ERRORS) return '';
 	$out = "<strong>Error: <em>{$message}</em> ({$obj->errno})</strong> {$obj->error}";
 	pre($out);
 	return $out;

@@ -21,7 +21,6 @@ class finance_api {
 		// create data tables
 		$sql = "CREATE TABLE IF NOT EXISTS transactions (
 			`id` mediumint NOT NULL AUTO_INCREMENT,
-			`time_ent` datetime NOT NULL,
 			`date` DATE NOT NULL,
 			`location` VARCHAR(50) NOT NULL,
 			`origin` smallint NOT NULL,
@@ -64,7 +63,7 @@ class finance_api {
 	
 	private function _resetDatabase() {
 		global $db;
-		$db->get_results( "DROP DATABASE ?", array($this->dbname) );
+		$db->get_results( "DROP DATABASE '{$this->dbname}'" );
 		$this->_createDatabase();
 	}
 	
@@ -77,10 +76,9 @@ class finance_api {
 	
 	public function addTrans($date, $location, $origin, $destin, $amount, $descr) {
 		global $db;
-		$time_ent = date('Y-m-d H:i:s');
-		$params = array( $time_ent,$date,$location,$origin,$destin,$amount,$descr );
-		$sql = "INSERT INTO transactions (time_ent,date,location,origin,destin,amount,descr)
-			VALUES (?,?,?,?,?,?,?);";
+		$params = array( $date,$location,$origin,$destin,$amount,$descr );
+		$sql = "INSERT INTO transactions (date,location,origin,destin,amount,descr)
+			VALUES (?,?,?,?,?,?);";
 		$db->get_results($sql, $params);
 	}
 	
@@ -137,15 +135,15 @@ class finance_api {
 		$params = array();
 		if (!empty($new_name)) {
 			$params[] = $new_name;
-			$sqls[] = 'name=?';
+			$sql[] = 'name=?';
 		}
 		if (!empty($new_descr)) {
 			$params[] = $new_descr;
-			$sqls[] = 'descr=?';
+			$sql[] = 'descr=?';
 		}
 		if (sizeof($params) > 0) {
 			$params[] = $name;
-			$new_sql = implode(',', $sqls);
+			$new_sql = implode(',', $sql);
 			$db->get_results("UPDATE tags SET {$new_sql} WHERE name=?", $params);
 		}
 	}
