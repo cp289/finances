@@ -6,10 +6,7 @@ class finance_api {
 	
 	public function __construct ( $dbname='finances' ) {
 		$this->dbname = $dbname;
-		$this->_createDatabase();
-		
-		global $db;
-		$db->select_db($dbname);
+		$this->_resetDatabase();
 	}
 	
 	private function _createDatabase(){
@@ -17,6 +14,9 @@ class finance_api {
 		
 		// create finances and select it
 		$db->get_results("CREATE DATABASE IF NOT EXISTS `{$this->dbname}`;");
+		
+		// improve the design... this call shouldn't be here
+		$db->select_db($this->dbname);
 		
 		// create data tables
 		$sql = "CREATE TABLE IF NOT EXISTS transactions (
@@ -63,7 +63,7 @@ class finance_api {
 	
 	private function _resetDatabase() {
 		global $db;
-		$db->get_results( "DROP DATABASE '{$this->dbname}'" );
+		$db->get_results( "DROP DATABASE `{$this->dbname}`;" );
 		$this->_createDatabase();
 	}
 	
