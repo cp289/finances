@@ -13,7 +13,7 @@ class finance_api {
 		global $db;
 		
 		// create finances and select it
-		$db->get_results("CREATE DATABASE IF NOT EXISTS `{$this->dbname}`;");
+		$db->get_results("CREATE DATABASE IF NOT EXISTS `{$this->dbname}`");
 		
 		// improve the design... this call shouldn't be here
 		$db->select_db($this->dbname);
@@ -34,6 +34,7 @@ class finance_api {
 			`type` smallint NOT NULL,
 			`name` varchar(50) NOT NULL,
 			`descr` varchar(150),
+			UNIQUE (name),
 			PRIMARY KEY (id)
 		);";
 		$sql .= "CREATE TABLE IF NOT EXISTS events (
@@ -63,7 +64,7 @@ class finance_api {
 	
 	private function _resetDatabase() {
 		global $db;
-		$db->get_results( "DROP DATABASE `{$this->dbname}`;" );
+		$db->get_results( "DROP DATABASE `{$this->dbname}`" );
 		$this->_createDatabase();
 	}
 	
@@ -71,15 +72,25 @@ class finance_api {
 	public function addAccount($name, $type, $descr='NULL') {
 		global $db;
 		$params = array($type, $name, $descr);
-		$db->get_results("INSERT INTO accounts (type,name,descr) VALUES (?,?,?);", $params);
+		$db->get_results("INSERT INTO accounts (type,name,descr) VALUES (?,?,?)", $params);
+	}
+	
+	public function deleteAccount($name) {
+		global $db;
+		$db->get_results("DELETE FROM accounts WHERE name=?",array($name));
 	}
 	
 	public function addTrans($date, $location, $origin, $destin, $amount, $descr) {
 		global $db;
 		$params = array( $date,$location,$origin,$destin,$amount,$descr );
 		$sql = "INSERT INTO transactions (date,location,origin,destin,amount,descr)
-			VALUES (?,?,?,?,?,?);";
+			VALUES (?,?,?,?,?,?)";
 		$db->get_results($sql, $params);
+	}
+	
+	public function deleteTrans($id) {
+		global $db;
+		$db->get_results("DELETE FROM transactions WHERE id=?",array($id));
 	}
 	
 	private function _createTag($name, $descr=null) {
@@ -109,7 +120,7 @@ class finance_api {
 	public function addTag($trans, $name, $descr=null) {
 		global $db;
 		// create new tag if necessary
-		if ( $db->get_results("SELECT COUNT(*) AS count FROM tags WHERE name=?;",array($name))[0]->count < 1 ) {
+		if ( $db->get_results("SELECT COUNT(*) AS count FROM tags WHERE name=?",array($name))[0]->count < 1 ) {
 			$this->_createTag($name,$descr);
 		}
 		if ( $db->get_results(
@@ -124,13 +135,13 @@ class finance_api {
 	
 	public function getTag($name) {
 		global $db;
-		if ( sizeof( $out=$db->get_results("SELECT * FROM tags WHERE name=?;", array($name)) )<1 ) return false;
+		if ( sizeof( $out=$db->get_results("SELECT * FROM tags WHERE name=?", array($name)) )<1 ) return false;
 		return $out[0];
 	}
 	
 	public function updateTag($name, $new_name=null, $new_descr=null) {
 		global $db;
-		if ( $db->get_results("SELECT COUNT(*) AS count FROM tags WHERE name=?;",array($name))[0]->count < 1 )
+		if ( $db->get_results("SELECT COUNT(*) AS count FROM tags WHERE name=?",array($name))[0]->count < 1 )
 			return false;
 		$params = array();
 		if (!empty($new_name)) {
