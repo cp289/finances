@@ -5,8 +5,9 @@ class finance_api {
 	private $dbname;
 	
 	public function __construct ( $dbname='finances' ) {
+		global $db;
 		$this->dbname = $dbname;
-		$this->_resetDatabase();
+		$db->select_db($this->dbname);
 	}
 	
 	private function _createDatabase(){
@@ -14,9 +15,6 @@ class finance_api {
 		
 		// create finances and select it
 		$db->get_results("CREATE DATABASE IF NOT EXISTS `{$this->dbname}`");
-		
-		// improve the design... this call shouldn't be here
-		$db->select_db($this->dbname);
 		
 		// create data tables
 		$sql = "CREATE TABLE IF NOT EXISTS transactions (
@@ -93,6 +91,53 @@ class finance_api {
 		$db->get_results("DELETE FROM transactions WHERE id=?",array($id));
 	}
 	
+	public function getTrans($id) {
+		global $db;
+		if (sizeof($out = $db->get_results("SELECT * FROM transactions WHERE id=?",array($id))) < 1) return false;
+		return $out[0];
+	}
+	
+	public function getTransactions($start=0, $limit=4722366482869645213696) {
+		global $db;
+		return $db->get_results("SELECT * FROM transactions ORDER BY date LIMIT ?,?",array($start,$limit));
+	}
+	
+	public function updateTrans($id,$new_date=null,$new_location=null,$new_origin=null,$new_destin=null,$new_amount=null,$new_descr=null) {
+		global $db;
+		if ( $db->get_results("SELECT count(*) AS count FROM transactions WHERE id=?",array($id))[0]->count < 1 )
+			return false;
+		$params = array();
+		if (isset($new_date)) {
+			$params[] = $new_date;
+			$sql[] = 'date=?';
+		}
+		if (isset($new_location)) {
+			$params[] = $new_location;
+			$sql[] = 'location=?';
+		}
+		if (isset($new_origin)) {
+			$params[] = $new_origin;
+			$sql[] = 'origin=?';
+		}
+		if (isset($new_destin)) {
+			$params[] = $new_destin;
+			$sql[] = 'destin=?';
+		}
+		if (isset($new_amount)) {
+			$params[] = $new_amount;
+			$sql[] = 'amount=?';
+		}
+		if (isset($new_descr)) {
+			$params[] = $new_descr;
+			$sql[] = 'descr=?';
+		}
+		if (sizeof($params)>0) {
+			$params[] = $id;
+			$new_sql = implode(',', $sql);
+			$db->get_results("UPDATE transactions SET $new_sql WHERE id=?", $params);
+		}
+	}
+	
 	private function _createTag($name, $descr=null) {
 		global $db;
 		$descr_col = empty($descr) ? '' : ',descr';
@@ -144,18 +189,18 @@ class finance_api {
 		if ( $db->get_results("SELECT COUNT(*) AS count FROM tags WHERE name=?",array($name))[0]->count < 1 )
 			return false;
 		$params = array();
-		if (!empty($new_name)) {
+		if (isset($new_name)) {
 			$params[] = $new_name;
 			$sql[] = 'name=?';
 		}
-		if (!empty($new_descr)) {
+		if (isset($new_descr)) {
 			$params[] = $new_descr;
 			$sql[] = 'descr=?';
 		}
 		if (sizeof($params) > 0) {
 			$params[] = $name;
 			$new_sql = implode(',', $sql);
-			$db->get_results("UPDATE tags SET {$new_sql} WHERE name=?", $params);
+			$db->get_results("UPDATE tags SET $new_sql WHERE name=?", $params);
 		}
 	}
 	
