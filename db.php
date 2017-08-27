@@ -6,7 +6,7 @@
 class db extends mysqli {
 	
 	// params probably only works for single queries...
-	public function get_results($sql, $params=array()) {
+	public function get_results($sql, $params=array(), $return_object=true) {
 		$queries = explode(';',$sql);
 		
 		$rows = array();
@@ -44,7 +44,7 @@ class db extends mysqli {
 			} else {
 				do {
 					if ( $res = $stmt->get_result() ) {
-						while ( $row = $res->fetch_object() ) {
+						while ( $row = $return_object ? $res->fetch_object() : $res->fetch_row() ) {
 							$rows[] = $row;
 						}
 						$res->close();
@@ -57,4 +57,4 @@ class db extends mysqli {
 }
 
 global $db;
-$db = new db('localhost', "root", "", "finances");
+$db = new db(SERVER_DOMAIN, MYSQL_USER, MYSQL_PASS, DB_NAME);

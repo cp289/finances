@@ -4,7 +4,7 @@ class finance_api {
 	
 	private $dbname;
 	
-	public function __construct ( $dbname='finances' ) {
+	public function __construct ( $dbname=DB_NAME ) {
 		global $db;
 		$this->dbname = $dbname;
 		$db->select_db($this->dbname);
@@ -15,16 +15,17 @@ class finance_api {
 		
 		// create finances and select it
 		$db->get_results("CREATE DATABASE IF NOT EXISTS `{$this->dbname}`");
+		$db->select_db($this->dbname);
 		
 		// create data tables
 		$sql = "CREATE TABLE IF NOT EXISTS transactions (
 			`id` mediumint NOT NULL AUTO_INCREMENT,
 			`date` DATE NOT NULL,
+			`descr` VARCHAR(150),
 			`location` VARCHAR(50) NOT NULL,
+			`amount` DECIMAL(10,2) NOT NULL,
 			`origin` smallint NOT NULL,
 			`destin` smallint NOT NULL,
-			`amount` DECIMAL(10,2) NOT NULL,
-			`descr` VARCHAR(150),
 			PRIMARY KEY (id)
 		);";
 		$sql .= "CREATE TABLE IF NOT EXISTS accounts (
@@ -78,11 +79,10 @@ class finance_api {
 		$db->get_results("DELETE FROM accounts WHERE name=?",array($name));
 	}
 	
-	public function addTrans($date, $location, $origin, $destin, $amount, $descr) {
+	public function addTrans($date, $descr, $location, $amount, $origin, $destin) {
 		global $db;
 		$params = array( $date,$location,$origin,$destin,$amount,$descr );
-		$sql = "INSERT INTO transactions (date,location,origin,destin,amount,descr)
-			VALUES (?,?,?,?,?,?)";
+		$sql = "INSERT INTO transactions (date,location,origin,destin,amount,descr) VALUES (?,?,?,?,?,?)";
 		$db->get_results($sql, $params);
 	}
 	
@@ -97,12 +97,19 @@ class finance_api {
 		return $out[0];
 	}
 	
+	// add field for account filter
 	public function getTransactions($start=0, $limit=4722366482869645213696) {
 		global $db;
-		return $db->get_results("SELECT * FROM transactions ORDER BY date LIMIT ?,?",array($start,$limit));
+		$sql = "SELECT transactions.id,date,transactions.descr,location,amount,
+			ac1.name AS origin, ac2.name AS destin
+			FROM transactions
+			INNER JOIN accounts AS ac1 ON transactions.origin=ac1.id
+			INNER JOIN accounts AS ac2 ON transactions.destin=ac2.id
+			ORDER BY date DESC LIMIT ?,?";
+		return $db->get_results($sql,array($start,$limit),false);
 	}
 	
-	public function updateTrans($id,$new_date=null,$new_location=null,$new_origin=null,$new_destin=null,$new_amount=null,$new_descr=null) {
+	public function updateTrans($id,$new_date=null,$new_descr=null,$new_location=null,$new_amount=null,$new_origin=null,$new_destin=null) {
 		global $db;
 		if ( $db->get_results("SELECT count(*) AS count FROM transactions WHERE id=?",array($id))[0]->count < 1 )
 			return false;

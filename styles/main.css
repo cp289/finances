@@ -1,6 +1,6 @@
 * {
-	padding:0px;
-	margin: 0px;
+	padding:0;
+	margin: 0;
 }
 
 body {
@@ -11,7 +11,6 @@ body {
 input[type="number"]::-webkit-outer-spin-button,
 input[type="number"]::-webkit-inner-spin-button {
     -webkit-appearance: none;
-    margin: 0;
 }
 input[type="number"] {
     -moz-appearance: textfield;
@@ -20,8 +19,28 @@ input[type="number"] {
 /* small number input field */
 .snum {
 	appearance:none;
-	margin:0px;
 	width: 15px;
+}
+
+.spreadsheet {
+	border-bottom: solid grey 1px;
+	border-right: solid grey 1px;
+	border-collapse:collapse;
+}
+
+.spreadsheet td, .spreadsheet th {
+	padding-left:10px;
+	padding-right:11px;
+	background-color:white;
+	border-left: solid grey 1px;
+	border-top: solid grey 1px;
+	height:1em;
+	width:auto;
+	text-align:right;
+}
+
+.spreadsheet th {
+	text-align:center;
 }
 
 #y {
