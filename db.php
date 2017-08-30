@@ -53,6 +53,7 @@ class db extends mysqli {
 			}
 		}
 		return $rows;
+		pp($rows);
 	}
 	
 	public function get_result($sql, $params=array(), $return_object=true) {
@@ -61,4 +62,4 @@ class db extends mysqli {
 }
 
 global $db;
-$db = new db(SERVER_DOMAIN, MYSQL_USER, MYSQL_PASS, DB_NAME);
+$db = new db(SERVER_DOMAIN, MYSQL_USER, MYSQL_PASS);
