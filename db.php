@@ -44,7 +44,7 @@ class db extends mysqli {
 			} else {
 				do {
 					if ( $res = $stmt->get_result() ) {
-						while ( $row = $return_object ? $res->fetch_object() : $res->fetch_row() ) {
+						while ( $row = $return_object ? $res->fetch_object() : $res->fetch_assoc() ) {
 							$rows[] = $row;
 						}
 						$res->close();
@@ -53,6 +53,10 @@ class db extends mysqli {
 			}
 		}
 		return $rows;
+	}
+	
+	public function get_result($sql, $params=array(), $return_object=true) {
+		return $this->get_results($sql, $params, $return_object)[0];
 	}
 }
 

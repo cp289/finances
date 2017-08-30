@@ -79,6 +79,24 @@ class finance_api {
 		$db->get_results("DELETE FROM accounts WHERE name=?",array($name));
 	}
 	
+	public function getAccount($name) {
+		global $db;
+		return $db->get_result("SELECT * FROM accounts WHERE name=?",array($name));
+	}
+	
+	// change parameter to $name
+	public function getAccountBalance($id) {
+		global $db;
+		$params = array($id,$id);
+		$sql = "SELECT *
+			FROM (SELECT SUM(amount) AS neg FROM transactions WHERE origin=?) AS t1,
+			(SELECT SUM(amount) AS pos FROM transactions WHERE destin=?) AS t2";
+		$res=$db->get_result($sql,$params);
+		$bal = $res->pos-$res->neg;
+		$bal = isset($bal)? $bal : '0.00';
+		pp($bal);
+	}
+	
 	public function addTrans($date, $descr, $location, $amount, $origin, $destin) {
 		global $db;
 		$params = array( $date,$location,$origin,$destin,$amount,$descr );
@@ -105,13 +123,13 @@ class finance_api {
 			FROM transactions
 			INNER JOIN accounts AS ac1 ON transactions.origin=ac1.id
 			INNER JOIN accounts AS ac2 ON transactions.destin=ac2.id
-			ORDER BY date DESC LIMIT ?,?";
+			ORDER BY date DESC,id DESC LIMIT ?,?";
 		return $db->get_results($sql,array($start,$limit),false);
 	}
 	
 	public function updateTrans($id,$new_date=null,$new_descr=null,$new_location=null,$new_amount=null,$new_origin=null,$new_destin=null) {
 		global $db;
-		if ( $db->get_results("SELECT count(*) AS count FROM transactions WHERE id=?",array($id))[0]->count < 1 )
+		if ( $db->get_result("SELECT count(*) AS count FROM transactions WHERE id=?",array($id))->count < 1 )
 			return false;
 		$params = array();
 		if (isset($new_date)) {
@@ -172,15 +190,15 @@ class finance_api {
 	public function addTag($trans, $name, $descr=null) {
 		global $db;
 		// create new tag if necessary
-		if ( $db->get_results("SELECT COUNT(*) AS count FROM tags WHERE name=?",array($name))[0]->count < 1 ) {
+		if ( $db->get_result("SELECT COUNT(*) AS count FROM tags WHERE name=?",array($name))->count < 1 ) {
 			$this->_createTag($name,$descr);
 		}
-		if ( $db->get_results(
+		if ( $db->get_result(
 				"SELECT COUNT(*) AS count FROM tag_map
 				INNER JOIN tags ON tag_map.tag=tags.id
 				WHERE name=?",
 				array($name)
-			)[0]->count < 1 ) {
+			)->count < 1 ) {
 			$this->_createTagMap($trans, $name);
 		}
 	}
@@ -193,7 +211,7 @@ class finance_api {
 	
 	public function updateTag($name, $new_name=null, $new_descr=null) {
 		global $db;
-		if ( $db->get_results("SELECT COUNT(*) AS count FROM tags WHERE name=?",array($name))[0]->count < 1 )
+		if ( $db->get_result("SELECT COUNT(*) AS count FROM tags WHERE name=?",array($name))->count < 1 )
 			return false;
 		$params = array();
 		if (isset($new_name)) {
