@@ -14,11 +14,11 @@ class finance_api {
 		global $db;
 		
 		// create finances and select it
-		$db->get_results("CREATE DATABASE IF NOT EXISTS `{$this->dbname}`");
+		$db->get_results("CREATE DATABASE `{$this->dbname}`");
 		$db->select_db($this->dbname);
 		
 		// create data tables
-		$sql = "CREATE TABLE IF NOT EXISTS transactions (
+		$sql = "CREATE TABLE transactions (
 			`id` mediumint NOT NULL AUTO_INCREMENT,
 			`date` DATE NOT NULL,
 			`descr` VARCHAR(150),
@@ -28,7 +28,7 @@ class finance_api {
 			`destin` smallint NOT NULL,
 			PRIMARY KEY (id)
 		);";
-		$sql .= "CREATE TABLE IF NOT EXISTS accounts (
+		$sql .= "CREATE TABLE accounts (
 			`id` mediumint NOT NULL AUTO_INCREMENT,
 			`type` smallint NOT NULL,
 			`name` varchar(50) NOT NULL,
@@ -36,7 +36,7 @@ class finance_api {
 			UNIQUE (name),
 			PRIMARY KEY (id)
 		);";
-		$sql .= "CREATE TABLE IF NOT EXISTS events (
+		$sql .= "CREATE TABLE events (
 			`id` int NOT NULL AUTO_INCREMENT,
 			`name` varchar(50) NOT NULL,
 			`date` date NOT NULL,
@@ -45,14 +45,14 @@ class finance_api {
 			UNIQUE (name),
 			PRIMARY KEY (id)
 		);";
-		$sql .= "CREATE TABLE IF NOT EXISTS tags (
+		$sql .= "CREATE TABLE tags (
 			`id` mediumint NOT NULL AUTO_INCREMENT,
 			`name` varchar(50) NOT NULL,
 			`descr` varchar(150),
 			UNIQUE (name),
 			PRIMARY KEY (id)
 		);";
-		$sql .= "CREATE TABLE IF NOT EXISTS tag_map (
+		$sql .= "CREATE TABLE tag_map (
 			`id` mediumint NOT NULL AUTO_INCREMENT,
 			`trans` mediumint NOT NULL,
 			`tag` mediumint NOT NULL,
