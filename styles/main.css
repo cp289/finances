@@ -23,8 +23,8 @@ input[type="number"] {
 }
 
 .spreadsheet {
-	border-bottom: solid grey 1px;
-	border-right: solid grey 1px;
+	border-bottom: solid #c0c0c0 1px;
+	border-right: solid #c0c0c0 1px;
 	border-collapse:collapse;
 }
 
@@ -32,8 +32,8 @@ input[type="number"] {
 	padding-left:10px;
 	padding-right:11px;
 	background-color:white;
-	border-left: solid grey 1px;
-	border-top: solid grey 1px;
+	border-left: solid #c0c0c0 1px;
+	border-top: solid #c0c0c0 1px;
 	height:1em;
 	width:auto;
 	text-align:right;
@@ -57,3 +57,5 @@ input[type="number"] {
 	margin-right:auto;
 	text-align:left;
 }
+
+

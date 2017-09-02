@@ -94,7 +94,7 @@ class finance_api {
 		$res=$db->get_result($sql,$params);
 		$bal = $res->pos-$res->neg;
 		$bal = isset($bal)? $bal : '0.00';
-		pp($bal);
+		return money_format('$%n',$bal);
 	}
 	
 	public function addTrans($date, $descr, $location, $amount, $origin, $destin) {
