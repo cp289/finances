@@ -5,6 +5,7 @@
 
 body {
 	text-align:center;
+	background-color:#0000aa;
 }
 
 /* remove number input spinners */
@@ -14,12 +15,15 @@ input[type="number"]::-webkit-inner-spin-button {
 }
 input[type="number"] {
     -moz-appearance: textfield;
+    width:4em;
 }
 
-/* small number input field */
-.snum {
-	appearance:none;
-	width: 15px;
+input[type="text"] {
+	width:7em;
+}
+
+input[type="text"].number {
+	width:4em;
 }
 
 .spreadsheet {
@@ -43,6 +47,30 @@ input[type="number"] {
 	text-align:center;
 }
 
+.section {
+	margin-left:auto;
+	margin-right:auto;
+	margin-top:20px;
+	float:center;
+	background-color: #bfbfbf;
+	padding: 20px;
+}
+
+#transactions {
+	float:left;
+	width:60%;
+}
+
+#accounts {
+	float:right;
+	width:30%;
+}
+
+#account_descr {
+	width:60%;
+	height:5em;
+}
+
 #y {
 	width: 30px;
 }
@@ -51,11 +79,11 @@ input[type="number"] {
 	width: 100px;
 }
 
-#main_container{
-	width:400px;
-	margin-left:auto;
-	margin-right:auto;
-	text-align:left;
+#main_container {
+	width:auto;
+	margin-left:50px;
+	margin-right:50px;
+	text-align:center;
 }
 
 

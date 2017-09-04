@@ -6,16 +6,14 @@ To do:
 
 // called on document load
 function setup() {
-	document.getElementById('ntbutton').focus();
+	document.getElementById('trans_date').focus();
 	
-	// auto-fill date form
+	/* Use this autofill feature later?
 	var date=new Date();
 	document.getElementById('m').value=date.getMonth()+1;
 	document.getElementById('d').value=date.getDate();
 	document.getElementById('y').value=date.getFullYear();
-	
-	// validate number
-	document.getElementById('amount').addEventListener('keypress',validateNum);
+	*/
 }
 
 // validates number input fields (doesn't work)
@@ -29,31 +27,6 @@ function validateNum(e){
 	//var txt = document.getElementById('amount').value;
 	//document.getElementById('amount').value=txt.substr(0,txt.length-1);
 	e.preventDefault();
-}
-
-// called when "new transaction" clicked
-function newTrans() {
-	document.getElementById('ntbutton').style="display:none;"; // append styles instead of edit?
-	document.getElementById('ntform').style="display:block;";
-	document.getElementById('ntform').getElementsByTagName('input')[0].focus();
-}
-
-// called when "cancel" is clicked
-function cancelNewTrans() {
-	document.getElementById('ntbutton').style="display:block;";
-	document.getElementById('ntform').style="display:none;"; // reset field defaults
-}
-
-function autoFocus(stage) { //redesign: need different stuff... figure this out later...
-	switch(stage){
-		case 0:
-			document.getElementsByTagName('input');
-			break;
-		case 1:
-			break;
-		case 2:
-			break;
-	}
 }
 
 // currently unused
