@@ -30,9 +30,9 @@ class finance_api {
 		);";
 		$sql .= "CREATE TABLE accounts (
 			`id` mediumint NOT NULL AUTO_INCREMENT,
-			`type` smallint NOT NULL,
 			`name` varchar(50) NOT NULL,
 			`descr` varchar(150),
+			`multi` smallint DEFAULT 1,
 			UNIQUE (name),
 			PRIMARY KEY (id)
 		);";
@@ -67,11 +67,10 @@ class finance_api {
 		$this->_createDatabase();
 	}
 	
-	// Important: escape all parameters (find right method)
-	public function addAccount($name, $type, $descr='NULL') {
+	public function addAccount($name, $descr=null, $multi=1) {
 		global $db;
-		$params = array($type, $name, $descr);
-		$db->get_results("INSERT INTO accounts (type,name,descr) VALUES (?,?,?)", $params);
+		$params = array($name, $descr, $multi);
+		$db->get_results("INSERT INTO accounts (name,descr,multi) VALUES (?,?,?)", $params);
 	}
 	
 	public function deleteAccount($name) {
@@ -84,7 +83,12 @@ class finance_api {
 		return $db->get_result("SELECT * FROM accounts WHERE name=?",array($name));
 	}
 	
-	// change parameter to $name
+	public function getAccounts() {
+		global $db;
+		return $db->get_results("SELECT * FROM accounts");
+	}
+
+	// change parameter to $name (difficult)
 	public function getAccountBalance($id) {
 		global $db;
 		$params = array($id,$id);
@@ -97,11 +101,15 @@ class finance_api {
 		return money_format('$%n',$bal);
 	}
 	
+	public function getColumns($table) {
+		global $db;
+		return $db->get_results("SELECT COLUMN_NAME AS name FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_SCHEMA=? AND TABLE_NAME=?",array(DB_NAME,$table));
+	}
+
 	public function addTrans($date, $descr, $location, $amount, $origin, $destin) {
 		global $db;
-		$params = array( $date,$location,$origin,$destin,$amount,$descr );
-		$sql = "INSERT INTO transactions (date,location,origin,destin,amount,descr) VALUES (?,?,?,?,?,?)";
-		$db->get_results($sql, $params);
+		$params = array( $date,$descr,$location,$amount,$origin,$destin );
+		$db->get_results("INSERT INTO transactions (date,descr,location,amount,origin,destin) VALUES (?,?,?,?,?,?)", $params);
 	}
 	
 	public function deleteTrans($id) {
