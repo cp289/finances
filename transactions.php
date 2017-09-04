@@ -16,8 +16,8 @@ $finApi->addTrans('2017-10-11','new purchase','lmoa',37.2,2,1);
 				<h2>Transactions</h2>
 				<table class=spreadsheet >
 					<tr>
-					<?php foreach ($db->get_results("SELECT COLUMN_NAME AS name FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_SCHEMA=? AND TABLE_NAME='transactions'",array(DB_NAME),false) as $col): ?>
-						<th><pre><?php echo $col['name']; ?></pre></th>
+					<?php foreach ($finApi->getColumns('transactions') as $col): ?>
+						<th><pre><?php echo $col->name; ?></pre></th>
 					<?php endforeach; ?>
 					</tr>
 				<?php foreach ($finApi->getTransactions() as $trans): ?>
