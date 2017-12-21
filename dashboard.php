@@ -11,29 +11,6 @@ if ( isset($form) ) {
 	}
 }
 
-function handle_account_form(){
-	global $finApi;
-	echo 'Handle account form';
-	$finApi->addAccount(
-		trim($_POST['acct_name']),
-		trim($_POST['acct_descr']),
-		trim($_POST['acct_multi'])
-	);
-}
-
-function handle_transaction_form(){
-	global $finApi;
-	echo 'Handle transaction form';
-	$finApi->addTrans(
-		trim($_POST['trans_date']),
-		trim($_POST['trans_descr']),
-		trim($_POST['trans_location']),
-		trim($_POST['trans_amount']),
-		trim($_POST['trans_origin']),
-		trim($_POST['trans_destin'])
-	);
-}
-
 ?><!Doctype html>
 <html>
 	<head>
