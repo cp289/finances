@@ -22,14 +22,35 @@ input[type="text"] {
 	width:7em;
 }
 
-input[type="text"].number {
+input[type="text"].small {
 	width:4em;
+}
+
+input[type="text"].medium {
+	width:12em;
+}
+
+input[type="text"].large {
+	width:17em;
+}
+
+.aleft {
+	text-align:left;
+}
+
+.aright {
+	text-align:right;
+}
+
+.hstretch {
+	width:100%;
 }
 
 .spreadsheet {
 	border-bottom: solid #c0c0c0 1px;
 	border-right: solid #c0c0c0 1px;
 	border-collapse:collapse;
+	width:100%;
 }
 
 .spreadsheet td, .spreadsheet th {
@@ -40,11 +61,15 @@ input[type="text"].number {
 	border-top: solid #c0c0c0 1px;
 	height:1em;
 	width:auto;
-	text-align:right;
+	text-align:left;
 }
 
 .spreadsheet th {
 	text-align:center;
+}
+
+.spreadsheet .amount,.spreadsheet .balance,.spreadsheet .id {
+	text-align:right;
 }
 
 .section {

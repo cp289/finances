@@ -14,13 +14,24 @@ if ( isset($form) ) {
 function handle_account_form(){
 	global $finApi;
 	echo 'Handle account form';
-	$finApi->addAccount($_POST['acct_name'],$_POST['acct_descr'],$_POST['acct_multi']);
+	$finApi->addAccount(
+		trim($_POST['acct_name']),
+		trim($_POST['acct_descr']),
+		trim($_POST['acct_multi'])
+	);
 }
 
 function handle_transaction_form(){
 	global $finApi;
 	echo 'Handle transaction form';
-	$finApi->addTrans($_POST['trans_date'],$_POST['trans_descr'],$_POST['trans_location'],$_POST['trans_amount'],$_POST['trans_origin'],$_POST['trans_destin']);
+	$finApi->addTrans(
+		trim($_POST['trans_date']),
+		trim($_POST['trans_descr']),
+		trim($_POST['trans_location']),
+		trim($_POST['trans_amount']),
+		trim($_POST['trans_origin']),
+		trim($_POST['trans_destin'])
+	);
 }
 
 ?><!Doctype html>
@@ -39,36 +50,42 @@ function handle_transaction_form(){
 				<br/>
 				<form action="" method=POST>
 					<input type=hidden name=form value=transaction />
-					<label>Date:</label>
-					<input name=trans_date id=trans_date type=text />
-					<label>Description:</label>
-					<input name=trans_descr type=text />
-					<br/>
-					<label>Location:</label>
-					<input name=trans_location type=text />
-					<label>Amount:</label>
-					<input name=trans_amount type=text class=number />
-					<br/>
-					<label>From:</label>
-					<select name=trans_origin>
-						<option value="">-</option>
-						<?php foreach ($finApi->getAccounts() as $acct):?>
-						<option value=<?php echo $acct->id; ?>><?php echo $acct->name; ?></option>
-						<?php endforeach; ?>
-					</select>
-					<label>To:</label>
-					<select name=trans_destin>
-						<option value="">-</option>
-						<?php foreach ($finApi->getAccounts() as $acct):?>
-						<option value=<?php echo $acct->id; ?>><?php echo $acct->name; ?></option>
-						<?php endforeach; ?>
-					</select>
-					<input type=submit value=Add />
+					<table style="margin-left:auto;margin-right:auto;">
+						<tr>
+							<td class=aright><label>Date:</label></td>
+							<td class=aleft><input name=trans_date id=trans_date type=text /></td>
+							<td class=aright><label>Description:</label></td>
+							<td class=aleft><input name=trans_descr type=text class=large /></td>
+						</tr>
+						<tr>
+							<td class=aright><label>Location:</label></td>
+							<td class=aleft><input name=trans_location type=text /></td>
+							<td class=aright><label>Amount:</label></td>
+							<td class=aleft><input name=trans_amount type=text class=small /></td>
+						</tr>
+						<tr>
+							<td class=aright><label>From:</label></td>
+							<td class=aleft><select name=trans_origin>
+								<option value="">-</option>
+								<?php foreach ($finApi->getAccounts() as $acct):?>
+								<option value=<?php echo $acct->id; ?>><?php echo $acct->name; ?></option>
+								<?php endforeach; ?>
+							</select></td>
+							<td class=aright><label>To:</label></td>
+							<td class=aleft><select name=trans_destin>
+								<option value="">-</option>
+								<?php foreach ($finApi->getAccounts() as $acct):?>
+								<option value=<?php echo $acct->id; ?>><?php echo $acct->name; ?></option>
+								<?php endforeach; ?>
+							</select></td>
+						</tr>
+						<tr><td></td><td></td><td><input type=submit value=Add class=hstretch /></td><td></td>
+					</table>
 				</form>
 				<br/>
 				<h4>All Transactions</h4>
 				<br/>
-				<table class=spreadsheet >
+				<table class=spreadsheet>
 					<tr>
 					  <?php foreach ($finApi->getColumns('transactions') as $col): ?>
 						<th><pre><?php echo $col->name; ?></pre></th>
@@ -76,8 +93,10 @@ function handle_transaction_form(){
 					</tr>
 				  <?php foreach ($finApi->getTransactions() as $trans): ?>
 					<tr>
-					  <?php foreach ($trans as $col=>$colval): ?>
-						<td><pre class="<?php echo $col; ?>"><?php echo $col=='amount'?money_format('$%n',$colval):$colval;?></pre></td>
+					  <?php foreach ($trans as $col=>$colval):
+							$outval=($col=='amount'?money_format('$%n',$colval):$colval);
+							$short=shorten_str($outval);?>
+						<td class="<?php echo $col; ?>" title="<?php echo $outval;?>"><pre><?php echo $short;?></pre></td>
 					  <?php endforeach; ?>
 					</tr>
 				  <?php  endforeach; ?>
@@ -90,22 +109,36 @@ function handle_transaction_form(){
 				<br/>
 				<form action="" method=POST>
 					<input type=hidden name=form value=account />
-					<label>Name:</label><input type=text name=acct_name />
-					<label>Type:</label>
-					<select name=acct_multi><option value=1>Debit</option><option value=-1>Credit</option></select>
-					<br/>
-					<label>Description:</label>
-					<textarea name=acct_descr id=account_descr></textarea>
-					<input type=submit value=Submit />
-					<br/>
+					<table style="margin-left:auto;margin-right:auto">
+						<tr>
+							<td class=aright><label>Name:</label></td>
+							<td><input type=text name=acct_name /></td>
+							<td><label>Type:</label></td>
+							<td><select name=acct_multi><option value=1>Debit</option><option value=-1>Credit</option></select></td>
+						</tr>
+						<tr>
+							<td class=aright><label>Description:</label></td>
+							<td colspan=3><textarea name=acct_descr id=account_descr style="width:100%"></textarea></td>
+						</tr>
+						<tr>
+							<td></td><td></td><td></td><td><input type=submit value=Submit /></td>
+					</table>
 				</form>
 				<br/>
-				<h4>All accounts</h4>
+				<h4>All Accounts</h4>
 				<table class=spreadsheet>
+				<tr>
+				<?php foreach ( $finApi->getColumns('accounts') as $col ): ?>
+					<th><?php echo $col->name;?></th>
+				<?php endforeach;?>
+					<th>Balance</th>
+				</tr>
 				<?php foreach ( $finApi->getAccounts() as $acct ): ?>
 					<tr><?php foreach ( $acct as $col=>$val ): ?>
 						<td><?php echo $val;?></td>
-					<?php endforeach; ?></tr>
+					<?php endforeach; ?>
+					<td class=balance><?php echo $finApi->getAccountBalance($acct->id);?></td>
+					</tr>
 				<?php endforeach; ?>
 				</table>
 			</div>
