@@ -32,6 +32,7 @@ class finance_api {
 		);";
 		$sql .= "CREATE TABLE accounts (
 			`id` mediumint NOT NULL AUTO_INCREMENT,
+			`order` mediumint DEFAULT 0,
 			`name` varchar(50) NOT NULL,
 			`descr` varchar(150),
 			`multi` smallint DEFAULT 1,
