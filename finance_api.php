@@ -93,7 +93,7 @@ class finance_api {
 	public function getAccounts() {
 		global $db;
 		$cols = implode($this->accountCols, ',');
-		return $db->get_results("SELECT $cols FROM accounts");
+		return $db->get_results("SELECT $cols FROM accounts ORDER BY `order` ASC");
 	}
 
 	public function getAccountBalance($name) {
