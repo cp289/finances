@@ -137,14 +137,15 @@ class finance_api {
 	}
 	
 	// add field for account filter
-	public function getTransactions($start=0, $limit=4722366482869645213696) {
+	public function getTransactions($reverse_order=true, $start=0, $limit=4722366482869645213696) {
 		global $db;
+		$order = $reverse_order ? 'DESC' : 'ASC';
 		$sql = "SELECT transactions.id,date,transactions.descr,location,amount,
 			ac1.name AS origin, ac2.name AS destin
 			FROM transactions
 			INNER JOIN accounts AS ac1 ON transactions.origin=ac1.id
 			INNER JOIN accounts AS ac2 ON transactions.destin=ac2.id
-			ORDER BY date DESC,id DESC LIMIT ?,?";
+			ORDER BY date $order,id $order LIMIT ?,?";
 		return $db->get_results($sql,array($start,$limit),false);
 	}
 	

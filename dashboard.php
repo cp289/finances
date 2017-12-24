@@ -61,6 +61,7 @@ if ( isset($form) ) {
 				</form>
 				<br/>
 				<h4>All Transactions</h4>
+				<button onClick="window.open('exportcsv.php');">Export CSV</button>
 				<br/>
 				<table class=spreadsheet>
 					<tr>
