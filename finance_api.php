@@ -100,12 +100,13 @@ class finance_api {
 	public function getAccountBalance($name) {
 		global $db;
 		$id = $this->getAccountId($name);
-		$params = array($id,$id);
+		$params = array($id,$id,$id);
 		$sql = "SELECT *
 			FROM (SELECT SUM(amount) AS neg FROM transactions WHERE origin=?) AS t1,
-			(SELECT SUM(amount) AS pos FROM transactions WHERE destin=?) AS t2";
-		$res=$db->get_result($sql,$params);
-		$bal = $res->pos-$res->neg;
+			(SELECT SUM(amount) AS pos FROM transactions WHERE destin=?) AS t2,
+			(SELECT multi FROM accounts WHERE id=?) AS t3";
+		$res = $db->get_result($sql,$params);
+		$bal = ($res->pos-$res->neg) * $res->multi;
 		$bal = isset($bal)? $bal : '0.00';
 		return money_format('$%n',$bal);
 	}
@@ -117,6 +118,18 @@ class finance_api {
 	public function getColumns($table) {
 		global $db;
 		return $db->get_results("SELECT COLUMN_NAME AS name FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_SCHEMA=? AND TABLE_NAME=?",array(DB_NAME,$table));
+	}
+
+	public function getCSV($data) {
+		foreach(array_keys($data[0]) as $col) $cols[] = '"' . $col . '"';
+		$header = implode($cols, ',') . "\r\n";
+		$body = "";
+		foreach ( $data as $row ) {
+			$entries = array();
+			foreach ( $row as $entry ) $entries[] = '"' . implode(explode('"',$entry),'""') . '"';
+			$body .= implode($entries, ',') . "\r\n";
+		}
+		return $header . $body;
 	}
 
 	public function addTrans($date, $descr, $location, $amount, $origin, $destin) {
