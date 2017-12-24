@@ -105,16 +105,16 @@ if ( isset($form) ) {
 				<h4>All Accounts</h4>
 				<table class=spreadsheet>
 				<tr>
-				<?php foreach ( $finApi->getColumns('accounts') as $col ): ?>
-					<th><?php echo $col->name;?></th>
+				<?php foreach ( $finApi->getAccountColumns() as $col ):?>
+					<th><?php echo $col;?></th>
 				<?php endforeach;?>
 					<th>Balance</th>
 				</tr>
-				<?php foreach ( $finApi->getAccounts() as $acct ): ?>
-					<tr><?php foreach ( $acct as $col=>$val ): ?>
+				<?php foreach ( $finApi->getAccounts() as $acct ):?>
+					<tr><?php foreach ( $acct as $col=>$val ):?>
 						<td><?php echo $val;?></td>
 					<?php endforeach; ?>
-					<td class=balance><?php echo $finApi->getAccountBalance($acct->id);?></td>
+					<td class=balance><?php echo $finApi->getAccountBalance($acct->name);?></td>
 					</tr>
 				<?php endforeach; ?>
 				</table>

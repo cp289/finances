@@ -3,10 +3,12 @@
 class finance_api {
 	
 	private $dbname;
+	private $accountCols;
 	
 	public function __construct ( $dbname=DB_NAME ) {
 		global $db;
 		$this->dbname = $dbname;
+		$this->accountCols = array('name','descr');
 		$db->select_db($this->dbname);
 	}
 	
@@ -83,14 +85,20 @@ class finance_api {
 		return $db->get_result("SELECT * FROM accounts WHERE name=?",array($name));
 	}
 	
-	public function getAccounts() {
+	public function getAccountId($name) {
 		global $db;
-		return $db->get_results("SELECT * FROM accounts");
+		return $db->get_result("SELECT id FROM accounts WHERE name=?",array($name))->id;
 	}
 
-	// change parameter to $name (difficult)
-	public function getAccountBalance($id) {
+	public function getAccounts() {
 		global $db;
+		$cols = implode($this->accountCols, ',');
+		return $db->get_results("SELECT $cols FROM accounts");
+	}
+
+	public function getAccountBalance($name) {
+		global $db;
+		$id = $this->getAccountId($name);
 		$params = array($id,$id);
 		$sql = "SELECT *
 			FROM (SELECT SUM(amount) AS neg FROM transactions WHERE origin=?) AS t1,
@@ -100,7 +108,11 @@ class finance_api {
 		$bal = isset($bal)? $bal : '0.00';
 		return money_format('$%n',$bal);
 	}
-	
+
+	public function getAccountColumns() {
+		return $this->accountCols;
+	}
+
 	public function getColumns($table) {
 		global $db;
 		return $db->get_results("SELECT COLUMN_NAME AS name FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_SCHEMA=? AND TABLE_NAME=?",array(DB_NAME,$table));
@@ -201,6 +213,7 @@ class finance_api {
 		if ( $db->get_result("SELECT COUNT(*) AS count FROM tags WHERE name=?",array($name))->count < 1 ) {
 			$this->_createTag($name,$descr);
 		}
+		// create tag map if it doesn't already exist
 		if ( $db->get_result(
 				"SELECT COUNT(*) AS count FROM tag_map
 				INNER JOIN tags ON tag_map.tag=tags.id

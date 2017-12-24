@@ -53,7 +53,6 @@ class db extends mysqli {
 			}
 		}
 		return $rows;
-		pp($rows);
 	}
 	
 	public function get_result($sql, $params=array(), $return_object=true) {
