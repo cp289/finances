@@ -24,6 +24,10 @@ if ( isset($form) ) {
 				<h3>Transactions</h3>
 				<hr/><br/>
 				<h4>New Transaction</h4>
+				<form action="uploadcsv.php" enctype="multipart/form-data" method=POST>
+					<input type="file" name="csvfile" title="Ensure the CSV file has the appropriate headers!"/>
+					<input type="submit" value="Upload CSV"/>
+				</form>
 				<br/>
 				<form action="" method=POST>
 					<input type=hidden name=form value=transaction />
@@ -45,14 +49,14 @@ if ( isset($form) ) {
 							<td class=aleft><select name=trans_origin>
 								<option value="">-</option>
 								<?php foreach ($finApi->getAccounts() as $acct):?>
-								<option value=<?php echo $acct->id; ?>><?php echo $acct->name; ?></option>
+								<option value="<?php echo $acct->name; ?>"><?php echo $acct->name; ?></option>
 								<?php endforeach; ?>
 							</select></td>
 							<td class=aright><label>To:</label></td>
 							<td class=aleft><select name=trans_destin>
 								<option value="">-</option>
 								<?php foreach ($finApi->getAccounts() as $acct):?>
-								<option value=<?php echo $acct->id; ?>><?php echo $acct->name; ?></option>
+								<option value="<?php echo $acct->name; ?>"><?php echo $acct->name; ?></option>
 								<?php endforeach; ?>
 							</select></td>
 						</tr>
@@ -77,7 +81,7 @@ if ( isset($form) ) {
 						<td class="<?php echo $col; ?>" title="<?php echo $outval;?>"><pre><?php echo $short;?></pre></td>
 					  <?php endforeach; ?>
 					</tr>
-				  <?php  endforeach; ?>
+				  <?php endforeach; ?>
 				</table>
 			</div>
 			<div class=section id=accounts>

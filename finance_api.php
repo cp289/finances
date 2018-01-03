@@ -120,6 +120,28 @@ class finance_api {
 		return $db->get_results("SELECT COLUMN_NAME AS name FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_SCHEMA=? AND TABLE_NAME=?",array(DB_NAME,$table));
 	}
 
+	private function _parseCSV( $file ) {
+		$rawdata = array_map('str_getcsv', file($file));
+		$header  = $rawdata[0];
+		unset($rawdata[0]);
+		$data = array();
+		foreach ( $rawdata as $row ) {
+			$newrow = array();
+			foreach ( $row as $i=>$entry ) {
+			 $newrow[$header[$i]] = $entry;
+			}
+			$data[] = $newrow;
+		}
+		return $data;
+	}
+
+	public function submitCSV($file) {
+		$data = $this->_parseCSV($file); // Does not support data with line breaks!
+		foreach ( $data as $row ) {
+			$this->addTrans($row['date'],$row['descr'],$row['location'],$row['amount'],$row['origin'],$row['destin']);
+		}
+	}
+	
 	public function getCSV($data) {
 		foreach(array_keys($data[0]) as $col) $cols[] = '"' . $col . '"';
 		$header = implode($cols, ',') . "\r\n";
@@ -132,10 +154,13 @@ class finance_api {
 		return $header . $body;
 	}
 
-	public function addTrans($date, $descr, $location, $amount, $origin, $destin) {
+	public function addTrans($date, $descr, $location, $amount, $origin, $destin) { // origin, destin must be strings for the name
 		global $db;
 		$params = array( $date,$descr,$location,$amount,$origin,$destin );
-		$db->get_results("INSERT INTO transactions (date,descr,location,amount,origin,destin) VALUES (?,?,?,?,?,?)", $params);
+		$db->get_result("INSERT INTO transactions
+			SET date=?,descr=?,location=?,amount=?,
+			origin=(SELECT id FROM accounts WHERE name=?),
+			destin=(SELECT id FROM accounts WHERE name=?)", $params);
 	}
 	
 	public function deleteTrans($id) {
@@ -222,7 +247,7 @@ class finance_api {
 	}
 	
 	// more corner cases?
-	public function addTag($trans, $name, $descr=null) {
+	public function addTags($trans, $name, $descr=null) {
 		global $db;
 		// create new tag if necessary
 		if ( $db->get_result("SELECT COUNT(*) AS count FROM tags WHERE name=?",array($name))->count < 1 ) {

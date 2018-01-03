@@ -14,6 +14,10 @@ function pre($var) {
 	print('</pre>');
 }
 
+function alert($message) {
+	print("<script>alert('$message');</script>");
+}
+
 function db_error($obj, $message) {
 	if (!PRINT_DB_ERRORS) return '';
 	$out = "<strong>Error: <em>{$message}</em> ({$obj->errno})</strong> {$obj->error}";
